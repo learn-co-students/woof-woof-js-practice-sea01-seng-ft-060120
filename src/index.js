@@ -1,13 +1,21 @@
+let btn = document.getElementById('good-dog-filter')
+let dogBar  = document.querySelector('#dog-bar')
+
+
 const fetchAllDogs = () => {
     fetch('http://localhost:3000/pups')
     .then(res => res.json())
-    .then(json => json.forEach(pup => listPups(pup)))
+    .then(puppies => {
+        btn.addEventListener('click', (e) => filterDogs(e, puppies))
+        puppies.forEach(pup => listPups(pup))
+    })
 }
 fetchAllDogs()
 
 const listPups = (pup) => {
     let dogBar  = document.querySelector('#dog-bar')
     let span = document.createElement('span')
+    span.id = pup.id
     span.innerText = pup.name
     dogBar.appendChild(span)
 
@@ -32,7 +40,7 @@ const dogShow = (e, pup) => {
 
 const changeStatus = (e, pup) => {
     e.preventDefault()
-    console.log(pup.isGoodDog)
+
     fetch(`http://localhost:3000/pups/${pup.id}`, {
         method: 'PATCH',
         headers: {
@@ -46,7 +54,6 @@ const changeStatus = (e, pup) => {
     .then(res => res.json())
     .then(pupper => {
         let div =  document.getElementById('dog-info')
-        console.log(pupper)
         let currentBtn = document.getElementById('Toggle')
         currentBtn.remove()
         let btn = document.createElement('button')
@@ -58,67 +65,27 @@ const changeStatus = (e, pup) => {
         div.appendChild(btn)
     })
 }
-
-//div.querySelector('button') - removes the need to add the id, only selecting the button on this card
-//can do querySelector on specific parts of your code, in this case you wouldn't have to re-add the id
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const dogSpan = (dog) => {
-
-//     let dogBar = document.getElementById('dog-bar')
-//     let span = document.createElement('span')
-//     span.innerText = `${dog.name}`
-//     span.id = `${dog.id}`
-//     dogBar.appendChild(span)
-
-//     let whichDog = document.getElementById(dog.id)
-//     whichDog.addEventListener('click', (e) => showDog(dog))
-// }
-
-// const showDog = (dog) => {
-//     let dogInfo = document.getElementById('dog-info')
-//     dogInfo.innerHTML = `
-//         <img src='${dog.image}'/>
-//         <h2>${dog.name}</h2>
-//         <button class="good-dog">Good Dog!</button>
-//     `
-
-//     let btn = dogInfo.querySelector('.good-dog')
-//     btn.addEventListener('click', (e) => changeStatus(e, dog))
-// }
-
-// const changeStatus = (e, dog) => {
-
-//     console.log(dog)
-//     function updateStatus() {
-//             if(dog.isGoodDog === true)
-//                     {let data = {isGoodDog: "Good Dog!"}}
-//             else {
-//                 let data = {isGoodDog: "Bad Dog!"}
-//             }
+//if off nothing
+//if on add/remove dog from bar
     
-//     fetch(`http://localhost:3000/pups/${dog.id}`, {
-//         method: 'PATCH',
-//         headers: {
-//             'Content-Type': 'application/pupper',
-//             'Accept': 'application/json'
-//         },
-//         body: JSON.stringify(data),
-//     })
-//     .then(res => res.json())
-//     .then(json => console.log(json))
 
-//     }
-// }
 
+const filterDogs = (e, pup) => {
+    console.log(btn.innerText)
+console.log(pup)
+let span = document.getElementById(pup.id)
+console.log(span)
+
+let filter
+if (btn.innerText === 'Filter good dogs: OFF') {
+    btn.innerText = 'Filter good dogs: ON';
+    let goodPup = pup.filter(pup => pup.isGoodDog == true)
+    dogBar.innerHTML = ''
+    goodPup.forEach(pup => listPups(pup))
+} else {
+    btn.innerText = 'Filter good dogs: OFF';
+    dogBar.innerHTML = ''
+    pup.forEach(pup => listPups(pup))
+}
+
+}
